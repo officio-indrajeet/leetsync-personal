@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>LeetSync Personal</title>
+<style>
+  :root {
+    --ink: #1d1b16; --paper: #f4efdc; --desk: #cfc8b0; --well: #fffdf2;
+    --shade: #b9b197; --glow: #8bd17c; --warn: #ff8a7a; --mark: #d9611a;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Courier New", monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; width: 392px; padding: 12px; background: var(--desk); font: 13px/1.5 var(--mono); color: var(--ink); }
+
+  .win { background: var(--paper); border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+
+  .bar { display: flex; align-items: center; gap: 8px; padding: 4px 6px; border-bottom: 2px solid var(--ink); }
+  .bar .box { width: 12px; height: 12px; border: 2px solid var(--ink); background: var(--paper); flex: none; }
+  .bar .rule { flex: 1; height: 12px; background: repeating-linear-gradient(var(--ink) 0 2px, transparent 2px 4px); }
+  .bar .name { flex: none; padding: 0 6px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+
+  .body { padding: 14px 16px 16px; }
+  h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -.02em; line-height: 1.1; }
+  h1 i { font-style: normal; border-bottom: 3px solid var(--mark); }
+  .sub { margin: 6px 0 0; color: #5b5646; font-size: 12px; }
+  .dbl { height: 5px; margin: 12px 0 2px; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--ink); }
+
+  label.f { display: block; margin: 12px 0 4px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+  label.f b { color: var(--mark); font-weight: 700; margin-right: 4px; }
+
+  input[type=text], input[type=password] {
+    width: 100%; padding: 7px 9px; font: 13px var(--mono); color: var(--ink);
+    background: var(--well); border: 2px solid var(--ink); border-radius: 0; outline: none;
+    box-shadow: inset 3px 3px 0 var(--shade); caret-color: var(--mark);
+  }
+  input::placeholder { color: #9a937c; }
+  input:focus { background: #fff6bf; }
+  .pair { display: flex; gap: 8px; }
+  .pair input { flex: 1; min-width: 0; }
+
+  button { font: 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; color: var(--ink);
+    background: var(--paper); border: 2px solid var(--ink); border-radius: 0; padding: 7px 12px; box-shadow: 3px 3px 0 var(--ink); }
+  button:hover { background: #fff6bf; }
+  button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+  button.go { background: var(--ink); color: var(--paper); }
+  button.go:hover { background: #3a3629; }
+  button.tiny { padding: 0 10px; box-shadow: 2px 2px 0 var(--ink); }
+
+  .chk { display: flex; align-items: center; gap: 8px; margin-top: 14px; cursor: pointer; user-select: none; }
+  .chk input { width: 16px; height: 16px; margin: 0; accent-color: var(--ink); }
+
+  .acts { display: flex; gap: 10px; margin-top: 16px; }
+
+  .term { margin-top: 16px; padding: 8px 10px; min-height: 52px; background: var(--ink); color: var(--glow); font-size: 12px; line-height: 1.5; border: 2px solid var(--ink); box-shadow: inset 0 0 0 2px #35321f; word-break: break-word; }
+  .term.bad { color: var(--warn); }
+  .term .cur { display: inline-block; width: 7px; height: 13px; margin-left: 3px; vertical-align: -2px; background: currentColor; animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  details { margin-top: 14px; border: 2px dashed var(--ink); padding: 6px 10px; font-size: 12px; }
+  summary { cursor: pointer; letter-spacing: .06em; text-transform: uppercase; }
+  ol { margin: 8px 0 2px; padding-left: 18px; }
+  li { margin: 3px 0; }
+</style>
+</head>
+<body>
+  <div class="win">
+    <div class="bar"><span class="box"></span><span class="rule"></span><span class="name">leetsync.cfg</span><span class="rule"></span></div>
+    <div class="body">
+      <h1>Leet<i>Sync</i></h1>
+      <p class="sub">accepted solutions &rarr; your repo. your token. nobody else.</p>
+      <div class="dbl"></div>
+
+      <label class="f" for="owner"><b>&gt;</b>github username</label>
+      <input id="owner" type="text" placeholder="octocat" autocomplete="off" spellcheck="false">
+
+      <label class="f" for="repo"><b>&gt;</b>repository</label>
+      <input id="repo" type="text" placeholder="leetcode-solutions" autocomplete="off" spellcheck="false">
+
+      <label class="f" for="branch"><b>&gt;</b>branch</label>
+      <input id="branch" type="text" placeholder="main" autocomplete="off" spellcheck="false">
+
+      <label class="f" for="token"><b>&gt;</b>access token</label>
+      <div class="pair">
+        <input id="token" type="password" placeholder="github_pat_..." autocomplete="off" spellcheck="false">
+        <button id="eye" class="tiny" type="button" aria-label="Show or hide token">show</button>
+      </div>
+
+      <p style="margin:14px 0 0;font-size:11px;color:#5b5646">saves to Topic/ProblemName.ext, e.g. TwoPointers/ThreeSum.java</p>
+
+      <div class="acts">
+        <button id="save" class="go" type="button">Save</button>
+        <button id="test" type="button">Test connection</button>
+      </div>
+
+      <div id="term" class="term">$ <span id="status">ready</span><span class="cur"></span></div>
+
+      <details>
+        <summary>make a token (once)</summary>
+        <ol>
+          <li>GitHub &rarr; Settings &rarr; Developer settings &rarr; Fine-grained tokens &rarr; Generate new token.</li>
+          <li>Repository access: only select repositories, pick your LeetCode repo.</li>
+          <li>Permissions &rarr; Contents: Read and write. Nothing else.</li>
+          <li>Paste it above. It stays in this browser only.</li>
+        </ol>
+      </details>
+    </div>
+  </div>
+<script src="options.js"></script>
+</body>
+</html>
