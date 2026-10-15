@@ -1,20 +1,23 @@
 {
   "manifest_version": 3,
   "name": "LeetSync Personal",
-  "version": "1.0.0",
-  "description": "Push your accepted LeetCode submissions to your own GitHub repo using your own token. No third-party OAuth.",
+  "version": "1.1.1",
+  "description": "Push your accepted LeetCode submissions to your own GitHub repo. Authorizes through your own OAuth app, no third party.",
   "permissions": ["storage"],
-  "host_permissions": ["https://leetcode.com/*", "https://api.github.com/*"],
+  "host_permissions": ["https://leetcode.com/*", "https://api.github.com/*", "https://github.com/*"],
   "background": { "service_worker": "background.js" },
   "content_scripts": [
     {
-      "matches": ["https://leetcode.com/problems/*"],
+      "matches": ["https://leetcode.com/*"],
+      "js": ["injected.js"],
+      "world": "MAIN",
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://leetcode.com/*"],
       "js": ["content.js"],
       "run_at": "document_start"
     }
-  ],
-  "web_accessible_resources": [
-    { "resources": ["injected.js"], "matches": ["https://leetcode.com/*"] }
   ],
   "options_page": "options.html",
   "action": { "default_title": "LeetSync Personal", "default_popup": "options.html" }

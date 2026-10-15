@@ -10,6 +10,7 @@
     --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Courier New", monospace;
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   body { margin: 0; width: 392px; padding: 12px; background: var(--desk); font: 13px/1.5 var(--mono); color: var(--ink); }
 
   .win { background: var(--paper); border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
@@ -28,15 +29,13 @@
   label.f { display: block; margin: 12px 0 4px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
   label.f b { color: var(--mark); font-weight: 700; margin-right: 4px; }
 
-  input[type=text], input[type=password] {
+  input[type=text] {
     width: 100%; padding: 7px 9px; font: 13px var(--mono); color: var(--ink);
     background: var(--well); border: 2px solid var(--ink); border-radius: 0; outline: none;
     box-shadow: inset 3px 3px 0 var(--shade); caret-color: var(--mark);
   }
   input::placeholder { color: #9a937c; }
   input:focus { background: #fff6bf; }
-  .pair { display: flex; gap: 8px; }
-  .pair input { flex: 1; min-width: 0; }
 
   button { font: 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; color: var(--ink);
     background: var(--paper); border: 2px solid var(--ink); border-radius: 0; padding: 7px 12px; box-shadow: 3px 3px 0 var(--ink); }
@@ -44,12 +43,15 @@
   button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
   button.go { background: var(--ink); color: var(--paper); }
   button.go:hover { background: #3a3629; }
-  button.tiny { padding: 0 10px; box-shadow: 2px 2px 0 var(--ink); }
+  button.wide { width: 100%; padding: 10px 12px; }
 
-  .chk { display: flex; align-items: center; gap: 8px; margin-top: 14px; cursor: pointer; user-select: none; }
-  .chk input { width: 16px; height: 16px; margin: 0; accent-color: var(--ink); }
+  .acts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+  .hint { margin: 12px 0 0; font-size: 11px; color: #5b5646; }
+  .who { margin: 12px 0 0; }
+  .who b { border-bottom: 3px solid var(--mark); font-weight: 700; }
 
-  .acts { display: flex; gap: 10px; margin-top: 16px; }
+  .code { margin-top: 12px; padding: 12px 8px; text-align: center; font-size: 28px; font-weight: 700; letter-spacing: .18em;
+    background: var(--well); border: 2px solid var(--ink); box-shadow: inset 3px 3px 0 var(--shade); user-select: all; }
 
   .term { margin-top: 16px; padding: 8px 10px; min-height: 52px; background: var(--ink); color: var(--glow); font-size: 12px; line-height: 1.5; border: 2px solid var(--ink); box-shadow: inset 0 0 0 2px #35321f; word-break: break-word; }
   .term.bad { color: var(--warn); }
@@ -67,42 +69,56 @@
     <div class="bar"><span class="box"></span><span class="rule"></span><span class="name">leetsync.cfg</span><span class="rule"></span></div>
     <div class="body">
       <h1>Leet<i>Sync</i></h1>
-      <p class="sub">accepted solutions &rarr; your repo. your token. nobody else.</p>
+      <p class="sub">accepted solutions &rarr; your repo. your own github app. nobody else.</p>
       <div class="dbl"></div>
 
-      <label class="f" for="owner"><b>&gt;</b>github username</label>
-      <input id="owner" type="text" placeholder="octocat" autocomplete="off" spellcheck="false">
+      <section id="setup">
+        <div id="cidbox">
+          <label class="f" for="cid"><b>&gt;</b>oauth client id</label>
+          <input id="cid" type="text" placeholder="Ov23li..." autocomplete="off" spellcheck="false">
+        </div>
+        <div class="acts"><button id="auth" class="go wide" type="button">Authorize with GitHub</button></div>
 
-      <label class="f" for="repo"><b>&gt;</b>repository</label>
-      <input id="repo" type="text" placeholder="leetcode-solutions" autocomplete="off" spellcheck="false">
+        <details id="help">
+          <summary>one-time: make your own app</summary>
+          <ol>
+            <li>github.com/settings/developers &rarr; OAuth Apps &rarr; New OAuth App.</li>
+            <li>Name: LeetSync Personal. Homepage URL and callback URL: https://github.com (unused).</li>
+            <li>Register it, then tick <b>Enable Device Flow</b> and update.</li>
+            <li>Copy the Client ID into the box above. Do not make a client secret.</li>
+          </ol>
+        </details>
+      </section>
 
-      <label class="f" for="branch"><b>&gt;</b>branch</label>
-      <input id="branch" type="text" placeholder="main" autocomplete="off" spellcheck="false">
+      <section id="pending" hidden>
+        <p class="who">enter this code on github.com/login/device</p>
+        <div id="code" class="code">----</div>
+        <p class="hint">copied to your clipboard. paste it on the GitHub page and approve. this popup updates by itself.</p>
+        <div class="acts">
+          <button id="reopen" class="go" type="button">Open GitHub</button>
+          <button id="cancel" type="button">Cancel</button>
+        </div>
+      </section>
 
-      <label class="f" for="token"><b>&gt;</b>access token</label>
-      <div class="pair">
-        <input id="token" type="password" placeholder="github_pat_..." autocomplete="off" spellcheck="false">
-        <button id="eye" class="tiny" type="button" aria-label="Show or hide token">show</button>
-      </div>
+      <section id="connected" hidden>
+        <p class="who">connected as <b id="login"></b></p>
 
-      <p style="margin:14px 0 0;font-size:11px;color:#5b5646">saves to Topic/ProblemName.ext, e.g. TwoPointers/ThreeSum.java</p>
+        <label class="f" for="repo"><b>&gt;</b>repository</label>
+        <input id="repo" type="text" placeholder="leetcode-solutions" autocomplete="off" spellcheck="false">
 
-      <div class="acts">
-        <button id="save" class="go" type="button">Save</button>
-        <button id="test" type="button">Test connection</button>
-      </div>
+        <label class="f" for="branch"><b>&gt;</b>branch</label>
+        <input id="branch" type="text" placeholder="main" autocomplete="off" spellcheck="false">
+
+        <p class="hint">created for you if it doesn't exist (private). files go to topic/ProblemName.ext, e.g. two-pointers/ThreeSum.java</p>
+
+        <div class="acts">
+          <button id="save" class="go" type="button">Save</button>
+          <button id="test" type="button">Test</button>
+          <button id="out" type="button">Disconnect</button>
+        </div>
+      </section>
 
       <div id="term" class="term">$ <span id="status">ready</span><span class="cur"></span></div>
-
-      <details>
-        <summary>make a token (once)</summary>
-        <ol>
-          <li>GitHub &rarr; Settings &rarr; Developer settings &rarr; Fine-grained tokens &rarr; Generate new token.</li>
-          <li>Repository access: only select repositories, pick your LeetCode repo.</li>
-          <li>Permissions &rarr; Contents: Read and write. Nothing else.</li>
-          <li>Paste it above. It stays in this browser only.</li>
-        </ol>
-      </details>
     </div>
   </div>
 <script src="options.js"></script>
